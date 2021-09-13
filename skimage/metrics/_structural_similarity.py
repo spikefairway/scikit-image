@@ -17,7 +17,8 @@ def structural_similarity(im1, im2,
                           *,
                           win_size=None, gradient=False, data_range=None,
                           channel_axis=None, multichannel=False,
-                          gaussian_weights=False, full=False, **kwargs):
+                          gaussian_weights=False, full=False,
+                          alpha=1.0, beta=1.0, gamma=1.0, **kwargs):
     """
     Compute the mean structural similarity index between two images.
 
@@ -63,6 +64,12 @@ def structural_similarity(im1, im2,
         Algorithm parameter, K2 (small constant, see [1]_).
     sigma : float
         Standard deviation for the Gaussian when `gaussian_weights` is True.
+    alpha : float
+        Coefficient for luminance comparison (default: 1.0)
+    beta : float
+        Coefficient for contrast comparison (default: 1.0)
+    gamma : float
+        Coefficient for structure comparison (default: 1.0)
 
     Returns
     -------
