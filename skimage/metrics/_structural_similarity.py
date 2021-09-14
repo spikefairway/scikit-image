@@ -15,7 +15,7 @@ __all__ = ['structural_similarity']
 @utils.deprecate_multichannel_kwarg()
 def structural_similarity(im1, im2,
                           *,
-                          win_size=None, gradient=False, data_range=None,
+                          win_size=None, data_range=None,
                           channel_axis=None, multichannel=False,
                           gaussian_weights=False, full=False,
                           alpha=1.0, beta=1.0, gamma=1.0, **kwargs):
@@ -30,8 +30,6 @@ def structural_similarity(im1, im2,
         The side-length of the sliding window used in comparison. Must be an
         odd value. If `gaussian_weights` is True, this is ignored and the
         window size will depend on `sigma`.
-    gradient : bool, optional
-        If True, also return the gradient with respect to im2.
     data_range : float, optional
         The data range of the input image (distance between minimum and
         maximum possible values). By default, this is estimated from the image
