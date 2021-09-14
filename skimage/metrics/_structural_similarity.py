@@ -248,7 +248,7 @@ def structural_similarity(im1, im2,
 
     # Structure comparison
     S_num = vxy + C3
-    S_denom = np.sqrt(vx) * np.sqrt(vy) + C3
+    S_denom = np.sqrt(vx * vy) + C3
     S = S_num / S_denom
 
     # SSIM
@@ -261,6 +261,6 @@ def structural_similarity(im1, im2,
     mssim = crop(ssim, pad).mean(dtype=np.float64)
 
     if full:
-        return mssim, S
+        return mssim, ssim
     else:
         return mssim
