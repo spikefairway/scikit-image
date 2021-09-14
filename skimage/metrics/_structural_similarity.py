@@ -228,34 +228,41 @@ def structural_similarity(im1, im2,
     R = data_range
     C1 = (K1 * R) ** 2
     C2 = (K2 * R) ** 2
+    C3 = C2 / 2
 
+    """
     A1, A2, B1, B2 = ((2 * ux * uy + C1,
                        2 * vxy + C2,
                        ux ** 2 + uy ** 2 + C1,
                        vx + vy + C2))
     D = B1 * B2
     S = (A1 * A2) / D
+    """
+    # Luminance comparison
+    L_num = 2 * ux * uy + C1
+    L_denom = ux ** 2 + uy ** 2 + C1
+    L = L_num / L_denom
+
+    # Contrast comparison
+    C_num = 2 * vx * vy + C2
+    C_denom = vx + vy + C2
+    C = C_num / C_denom
+
+    # Structure comparison
+    S_num = vxy + C3
+    S_denom = np.sqrt(vx) * np.sqrt(vy) + C3
+    S = S_num / S_denom
+
+    # SSIM
+    ssim = L ** alpha * C ** beta * S ** gamma
 
     # to avoid edge effects will ignore filter radius strip around edges
     pad = (win_size - 1) // 2
 
     # compute (weighted) mean of ssim. Use float64 for accuracy.
-    mssim = crop(S, pad).mean(dtype=np.float64)
+    mssim = crop(ssim, pad).mean(dtype=np.float64)
 
-    if gradient:
-        # The following is Eqs. 7-8 of Avanaki 2009.
-        grad = filter_func(A1 / D, **filter_args) * im1
-        grad += filter_func(-S / B2, **filter_args) * im2
-        grad += filter_func((ux * (A2 - A1) - uy * (B2 - B1) * S) / D,
-                            **filter_args)
-        grad *= (2 / im1.size)
-
-        if full:
-            return mssim, grad, S
-        else:
-            return mssim, grad
+    if full:
+        return mssim, S
     else:
-        if full:
-            return mssim, S
-        else:
-            return mssim
+        return mssim
