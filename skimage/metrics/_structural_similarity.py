@@ -16,7 +16,6 @@ __all__ = ['structural_similarity']
 def structural_similarity(im1, im2,
                           *,
                           win_size=None, data_range=None,
-                          channel_axis=None, multichannel=False,
                           gaussian_weights=False, full=False,
                           alpha=1.0, beta=1.0, gamma=1.0, **kwargs):
     """
@@ -34,17 +33,6 @@ def structural_similarity(im1, im2,
         The data range of the input image (distance between minimum and
         maximum possible values). By default, this is estimated from the image
         data-type.
-    channel_axis : int or None, optional
-        If None, the image is assumed to be a grayscale (single channel) image.
-        Otherwise, this parameter indicates which axis of the array corresponds
-        to channels.
-
-        .. versionadded:: 0.19
-           ``channel_axis`` was added in 0.19.
-    multichannel : bool, optional
-        If True, treat the last dimension of the array as channels. Similarity
-        calculations are done independently for each channel then averaged.
-        This argument is deprecated: specify `channel_axis` instead.
     gaussian_weights : bool, optional
         If True, each patch has its mean and variance spatially weighted by a
         normalized Gaussian kernel of width sigma=1.5.
@@ -105,35 +93,6 @@ def structural_similarity(im1, im2,
     """
     check_shape_equality(im1, im2)
     float_type = _supported_float_type(im1.dtype)
-
-    if channel_axis is not None:
-        # loop over channels
-        args = dict(win_size=win_size,
-                    gradient=gradient,
-                    data_range=data_range,
-                    channel_axis=None,
-                    gaussian_weights=gaussian_weights,
-                    full=full)
-        args.update(kwargs)
-        nch = im1.shape[channel_axis]
-        mssim = np.empty(nch, dtype=float_type)
-
-        if full:
-            S = np.empty(im1.shape, dtype=float_type)
-        channel_axis = channel_axis % im1.ndim
-        _at = functools.partial(utils.slice_at_axis, axis=channel_axis)
-        for ch in range(nch):
-            ch_result = structural_similarity(im1[_at(ch)],
-                                              im2[_at(ch)], **args)
-            if full:
-                mssim[ch], S[_at(ch)] = ch_result
-            else:
-                mssim[ch] = ch_result
-        mssim = mssim.mean()
-        if full:
-            return mssim, S
-        else:
-            return mssim
 
     K1 = kwargs.pop('K1', 0.01)
     K2 = kwargs.pop('K2', 0.03)
