@@ -118,8 +118,6 @@ def structural_similarity(im1, im2,
         nch = im1.shape[channel_axis]
         mssim = np.empty(nch, dtype=float_type)
 
-        if gradient:
-            G = np.empty(im1.shape, dtype=float_type)
         if full:
             S = np.empty(im1.shape, dtype=float_type)
         channel_axis = channel_axis % im1.ndim
@@ -127,20 +125,12 @@ def structural_similarity(im1, im2,
         for ch in range(nch):
             ch_result = structural_similarity(im1[_at(ch)],
                                               im2[_at(ch)], **args)
-            if gradient and full:
-                mssim[ch], G[_at(ch)], S[_at(ch)] = ch_result
-            elif gradient:
-                mssim[ch], G[_at(ch)] = ch_result
-            elif full:
+            if full:
                 mssim[ch], S[_at(ch)] = ch_result
             else:
                 mssim[ch] = ch_result
         mssim = mssim.mean()
-        if gradient and full:
-            return mssim, G, S
-        elif gradient:
-            return mssim, G
-        elif full:
+        if full:
             return mssim, S
         else:
             return mssim
